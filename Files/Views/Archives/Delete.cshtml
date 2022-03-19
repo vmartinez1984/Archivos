@@ -1,0 +1,62 @@
+﻿@model Files.Models.Archive
+
+@{
+    ViewData["Title"] = "Borrar archivo";
+}
+
+<h1>Borrar archivo</h1>
+
+<h3>¿Desea borrar el archivo?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Base64)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Base64)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Extension)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Extension)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FolderId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Folder.Name)
+        </dd>
+        @* <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.OnlyRead)
+            </dt>
+            <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.OnlyRead)
+            </dd>
+            <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IsActive)
+            </dt>
+            <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IsActive)
+            </dd>*@
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateRegistration)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateRegistration)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Borrar" class="btn btn-danger" /> |
+        <a asp-action="Index">Regresar a la lista</a>
+    </form>
+</div>
