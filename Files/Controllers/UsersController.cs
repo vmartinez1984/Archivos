@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Files.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Files.Filter;
 
 namespace Files.Controllers
 {
+    [ServiceFilter(typeof(VerificationSession))]
     public class UsersController : Controller
     {
         private readonly AppDbContext _context;
@@ -21,7 +21,7 @@ namespace Files.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-            return View(await _context.User.ToListAsync());
+            return View(await _context.User.Where(x=> x.IsActive).ToListAsync());
         }
 
         // GET: Users/Details/5
@@ -45,6 +45,7 @@ namespace Files.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
+            ViewBag.ListRoles = new SelectList(_context.Role.Where(x => x.IsActive).ToList(), "Id", "Name");
             return View();
         }
 
@@ -53,7 +54,7 @@ namespace Files.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,LastName,UserName,Password,Id,IsActive,DateRegistration")] User user)
+        public async Task<IActionResult> Create([Bind("Name,LastName,UserName,Password,Id, RoleId,IsActive,DateRegistration")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -77,6 +78,8 @@ namespace Files.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.ListRoles = new SelectList(_context.Role.Where(x => x.IsActive).ToList(), "Id", "Name");
             return View(user);
         }
 
@@ -85,7 +88,7 @@ namespace Files.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Name,LastName,UserName,Password,Id,IsActive,DateRegistration")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Name,LastName,UserName,Password,Id, RoleId,IsActive,DateRegistration")] User user)
         {
             if (id != user.Id)
             {
@@ -139,7 +142,7 @@ namespace Files.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var user = await _context.User.FindAsync(id);
-            _context.User.Remove(user);
+            user.IsActive = false;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

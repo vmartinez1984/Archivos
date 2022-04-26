@@ -1,4 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@{
+    @using Files.Helpers
+    @using Microsoft.AspNetCore.Http
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+    string userName;
+    int userRoleId;
+    int userId;
+
+    userName = HttpContextAccessor.HttpContext.Session.GetString(SessionUser.FullName);
+    userRoleId = HttpContextAccessor.HttpContext.Session.GetInt32(SessionUser.RoleId) is null ? 0 : (int)HttpContextAccessor.HttpContext.Session.GetInt32(SessionUser.RoleId);
+    userId = HttpContextAccessor.HttpContext.Session.GetInt32(SessionUser.Id) is null ? 0 : (int)HttpContextAccessor.HttpContext.Session.GetInt32(SessionUser.Id);
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,7 +18,7 @@
     <title>@ViewData["Title"] - TechSide</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="icon" href="~/img/TechSide.ico"/>
+    <link rel="icon" href="~/img/TechSide.ico" />
 </head>
 <body>
     <header>
@@ -17,22 +29,63 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Folders" asp-action="Index">Carpetas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Archives" asp-action="Index">Archivos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Acerca de</a>
-                        </li>
-                    </ul>
-                </div>
+                @switch (userRoleId)
+                {
+                    case SessionRole.Administrador:
+                        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Folders" asp-action="Index">Carpetas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Archives" asp-action="Index">Archivos</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Usuarios</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Acerca de</a>
+                                </li>
+                            </ul>
+                        </div>
+                        break;
+                    case SessionRole.Colaborador:
+                        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Folders" asp-action="Index">Carpetas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Archives" asp-action="Index">Archivos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Acerca de</a>
+                                </li>
+                            </ul>
+                        </div>
+                        break;
+                }
+                @if (userRoleId != 0)
+                {
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <div class="dropdown">
+                            <button class="btn btn-primary  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @userName
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" asp-action="logout" asp-controller="login">Cerrar sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </nav>
     </header>

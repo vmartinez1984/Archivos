@@ -8,9 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using Files.Models;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Files.Filter;
+using Microsoft.AspNetCore.Http;
+using Files.Helpers;
 
 namespace Files.Controllers
 {
+    [ServiceFilter(typeof(VerificationSession))]
     public class ArchivesController : Controller
     {
         private readonly AppDbContext _context;
@@ -25,7 +29,15 @@ namespace Files.Controllers
         // GET: Archives
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Archive.Include(x => x.Folder).Where(x => x.IsActive).ToListAsync());
+            User user;
+            int userId;
+
+            userId = (int)HttpContext.Session.GetInt32(SessionUser.Id);
+            user = await _context.User.Where(x => x.Id == userId && x.IsActive).FirstOrDefaultAsync();
+            if (user.RoleId == SessionRole.Administrador)
+                return View(await _context.Archive.Include(x => x.Folder).Where(x => x.IsActive).ToListAsync());
+            else
+                return View(await _context.Archive.Include(x => x.Folder).Where(x => x.UserId == userId && x.IsActive).ToListAsync());
         }
 
         // GET: Archives/Details/5
@@ -47,9 +59,14 @@ namespace Files.Controllers
         }
 
         // GET: Archives/Create
-        public IActionResult Create()
+        public IActionResult Create(int? folderId)
         {
-            ViewData["ListFolders"] = new SelectList(_context.Folder.Where(x => x.IsActive), "Id", "Name");
+            int userId;
+
+            userId = (int)HttpContext.Session.GetInt32(SessionUser.Id);
+            ViewData["ListFolders"] = new SelectList(_context.Folder.Where(x => x.UserId == userId && x.IsActive), "Id", "Name", folderId);
+            ViewBag.FolderId = folderId;
+
             return View();
         }
 
@@ -61,7 +78,7 @@ namespace Files.Controllers
         public async Task<IActionResult> Create([Bind("Name,Base64,Extension,FolderId,OnlyRead,Id,IsActive,DateRegistration,FormFile")] Archive archive)
         {
             if (ModelState.IsValid)
-            {
+            {                
                 string filePath;
                 FileStream fileStream;
                 Guid guid;
@@ -81,7 +98,7 @@ namespace Files.Controllers
                     FolderId = archive.FolderId,
                     OnlyRead = true,
                     Extension = fileInfo.Extension,
-                    UserId = 1,
+                    UserId = (int)HttpContext.Session.GetInt32(SessionUser.Id),
                     Name = archive.FormFile.FileName
                 };
 
@@ -105,6 +122,10 @@ namespace Files.Controllers
             {
                 return NotFound();
             }
+            int userId;
+
+            userId = (int)HttpContext.Session.GetInt32(SessionUser.Id);
+            ViewData["ListFolders"] = new SelectList(_context.Folder.Where(x => x.UserId == userId && x.IsActive), "Id", "Name");
             return View(archive);
         }
 

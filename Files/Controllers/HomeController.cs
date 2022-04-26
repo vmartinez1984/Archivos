@@ -1,4 +1,5 @@
-﻿using Files.Models;
+﻿using Files.Filter;
+using Files.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,6 +19,7 @@ namespace Files.Controllers
             _logger = logger;
         }
 
+        [ServiceFilter(typeof(VerificationSession))]
         public IActionResult Index()
         {
             return View();

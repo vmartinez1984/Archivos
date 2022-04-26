@@ -32,15 +32,9 @@
 </div>
 
 <h4>Lista de archivos</h4>
-<ul>
-
-    @foreach (var item in Model.ListArchives)
-    {
-        <li>
-            <a href="@item.Base64">@item.Name</a> @item.DateRegistration
-        </li>
-    }
-</ul>
+<div>
+    @await Html.PartialAsync("_ListArchives", Model.ListArchives)
+</div>
 <div>
     <a asp-action="Index">Regresar a la lista</a>
 </div>

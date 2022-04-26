@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Files.Models;
+using Files.Filter;
+using Microsoft.AspNetCore.Http;
+using Files.Helpers;
 
 namespace Files.Controllers
 {
+    [ServiceFilter(typeof(VerificationSession))]
     public class FoldersController : Controller
     {
         private readonly AppDbContext _context;
@@ -21,7 +25,15 @@ namespace Files.Controllers
         // GET: Folders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Folder.Where(x => x.IsActive).ToListAsync());
+            User user;
+            int userId;
+
+            userId = (int)HttpContext.Session.GetInt32(SessionUser.Id);
+            user = await _context.User.Where(x => x.Id == userId && x.IsActive).FirstOrDefaultAsync();
+            if (user.RoleId == SessionRole.Administrador)
+                return View(await _context.Folder.Include(x=>x.ListArchives).Where(x => x.IsActive).ToListAsync());
+            else
+                return View(await _context.Folder.Include(x => x.ListArchives).Where(x => x.UserId == userId && x.IsActive).ToListAsync());
         }
 
         // GET: Folders/Details/5
@@ -56,6 +68,7 @@ namespace Files.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,FolderId,Id,IsActive,DateRegistration")] Folder folder)
         {
+            folder.UserId = (int)HttpContext.Session.GetInt32(SessionUser.Id);
             if (ModelState.IsValid)
             {
                 _context.Add(folder);

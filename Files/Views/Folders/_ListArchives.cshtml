@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Files.Models.Archive>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Base64)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Extension)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FolderId)
+            </th>
+            @* <th>
+            @Html.DisplayNameFor(model => model.OnlyRead)
+            </th>*@
+
+            <th>
+                @Html.DisplayNameFor(model => model.DateRegistration)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a href="@item.Base64">@item.Name</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Extension)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Folder.Name)
+                </td>
+                @* <td>
+            @Html.DisplayFor(modelItem => item.OnlyRead)
+            </td>*@
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateRegistration)
+                </td>
+                <td>                    
+                    <a asp-action="Details" asp-controller="archives" asp-route-id="@item.Id">Detalles</a> |
+                    <a asp-action="Delete" asp-controller="archives" asp-route-id="@item.Id">Borrar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -61,6 +61,32 @@ namespace Files.Migrations
                     b.ToTable("Archive");
                 });
 
+            modelBuilder.Entity("Files.Models.FilesUsers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ArchiveId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateRegistration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveId");
+
+                    b.ToTable("FilesUsers");
+                });
+
             modelBuilder.Entity("Files.Models.Folder", b =>
                 {
                     b.Property<int>("Id")
@@ -78,14 +104,16 @@ namespace Files.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Folder");
                 });
 
-            modelBuilder.Entity("Files.Models.User", b =>
+            modelBuilder.Entity("Files.Models.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -98,23 +126,76 @@ namespace Files.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Role");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateRegistration = new DateTime(2022, 4, 25, 18, 22, 37, 603, DateTimeKind.Local).AddTicks(4303),
+                            IsActive = true,
+                            Name = "Administrador"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateRegistration = new DateTime(2022, 4, 25, 18, 22, 37, 603, DateTimeKind.Local).AddTicks(5205),
+                            IsActive = true,
+                            Name = "Colaborador"
+                        });
+                });
+
+            modelBuilder.Entity("Files.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateRegistration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("FilesUsersId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FilesUsersId");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("User");
 
@@ -122,12 +203,24 @@ namespace Files.Migrations
                         new
                         {
                             Id = 1,
-                            DateRegistration = new DateTime(2022, 3, 10, 18, 25, 16, 495, DateTimeKind.Local).AddTicks(5983),
+                            DateRegistration = new DateTime(2022, 4, 25, 18, 22, 37, 605, DateTimeKind.Local).AddTicks(2560),
                             IsActive = true,
                             LastName = "",
-                            Name = "Usuario",
+                            Name = "Administrador",
                             Password = "123456",
-                            UserName = "usuario"
+                            RoleId = 1,
+                            UserName = "administrador"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateRegistration = new DateTime(2022, 4, 25, 18, 22, 37, 605, DateTimeKind.Local).AddTicks(4525),
+                            IsActive = true,
+                            LastName = "",
+                            Name = "Colaborador",
+                            Password = "123456",
+                            RoleId = 2,
+                            UserName = "colaborador"
                         });
                 });
 
@@ -148,6 +241,37 @@ namespace Files.Migrations
                     b.Navigation("Folder");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Files.Models.FilesUsers", b =>
+                {
+                    b.HasOne("Files.Models.Archive", "Archive")
+                        .WithMany()
+                        .HasForeignKey("ArchiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Archive");
+                });
+
+            modelBuilder.Entity("Files.Models.User", b =>
+                {
+                    b.HasOne("Files.Models.FilesUsers", null)
+                        .WithMany("ListUsers")
+                        .HasForeignKey("FilesUsersId");
+
+                    b.HasOne("Files.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Files.Models.FilesUsers", b =>
+                {
+                    b.Navigation("ListUsers");
                 });
 
             modelBuilder.Entity("Files.Models.Folder", b =>

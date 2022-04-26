@@ -1,0 +1,41 @@
+﻿@model Files.Dtos.Inputs.UserLogin
+
+@{
+    ViewData["Title"] = "Inicio de sesión";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<div class="mt-5 text-center" style="background-image: url('/img/TechSide.PNG'); background-position: center;  background-repeat: no-repeat;  background-size: cover;  position: relative;  overflow: hidden;">
+
+    <hr />
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <form asp-action="Index">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="UserName" class="control-label text-white"></label>
+                    <input asp-for="UserName" class="form-control" autofocus placeholder="Usuario" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password" class="control-label text-white"></label>
+                    <input asp-for="Password" class="form-control" placeholder="Contraseña" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Iniciar sesión" class="btn btn-primary btn-block" />
+                </div>
+            </form>
+            @if (ViewBag.Error != null)
+            {
+                <div class="text-danger">@ViewBag.Error</div>
+            }
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

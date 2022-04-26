@@ -8,7 +8,7 @@ namespace Files.Models
         [Key]
         public int Id { get; set; }
 
-        [Required]
+        [Required]        
         public bool IsActive { get; set; } = true;
 
         [Display(Name = "Fecha de registro")]

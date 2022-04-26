@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace Files.Models
 {
@@ -8,7 +9,9 @@ namespace Files.Models
         private IConfiguration _configuration;
 
         public DbSet<Archive> Archive { get; set; }
+        public DbSet<FilesUsers> FilesUsers { get; set; }
         public DbSet<Folder> Folder { get; set; }
+        public DbSet<Role> Role { get; set; }
         public DbSet<User> User { get; set; }
         public AppDbContext()
         {
@@ -38,6 +41,10 @@ namespace Files.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Administrador", DateRegistration = DateTime.Now, IsActive = true},
+                new Role { Id = 2, Name = "Colaborador", DateRegistration = DateTime.Now, IsActive = true}
+            );
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -45,10 +52,21 @@ namespace Files.Models
                     DateRegistration = System.DateTime.Now,
                     IsActive = true,
                     LastName = "",
-                    Name = "Usuario",
+                    Name = "Administrador",
                     Password = "123456",
-                    UserName = "usuario"
-
+                    UserName = "administrador",
+                    RoleId = 1
+                },
+                new User
+                {
+                    Id = 2,
+                    DateRegistration = System.DateTime.Now,
+                    IsActive = true,
+                    LastName = "",
+                    Name = "Colaborador",
+                    Password = "123456",
+                    UserName = "colaborador",
+                    RoleId = 2
                 }
             );
         }
